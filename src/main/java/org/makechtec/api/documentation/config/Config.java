@@ -16,7 +16,7 @@ public class Config {
 
     @Bean
     public SQLSupport sqlSupport(){
-        return new SQLSupport();
+        return new SQLSupport("application.properties");
     }
 
     @Bean
@@ -57,17 +57,17 @@ public class Config {
     @Bean
     public WebMvcConfigurer corsConfigurer(){
 
-        var corsProperties = new PropertyLoader("cors.properties");
+        var corsProperties = new PropertyLoader("application.properties");
 
         var clientURL =
-                corsProperties.getProperty("protocol").orElse("") + "://" + corsProperties.getProperty("client_host").orElse("") + ":" + corsProperties.getProperty("client_port").orElse("");
+                corsProperties.getProperty("cors_protocol").orElse("") + "://" + corsProperties.getProperty("cors_client_host").orElse("") + ":" + corsProperties.getProperty("cors_client_port").orElse("");
 
         return new WebMvcConfigurer() {
 
             @Override
             public void addCorsMappings(CorsRegistry corsRegistry){
                 corsRegistry.addMapping("/**")
-                        .allowedMethods(corsProperties.getProperty("methods").orElse(""))
+                        .allowedMethods(corsProperties.getProperty("cors_methods").orElse(""))
                         .allowedOrigins(clientURL);
             }
         };
