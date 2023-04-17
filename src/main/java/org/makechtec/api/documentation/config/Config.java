@@ -5,6 +5,7 @@ import org.makechtec.api.documentation.components.dependency_tag.DependencyTagMa
 import org.makechtec.api.documentation.components.project.ProjectMapper;
 import org.makechtec.api.documentation.components.version.VersionMapper;
 import org.makechtec.software.properties_loader.PropertyLoader;
+import org.makechtec.software.sql_support.ConnectionInformation;
 import org.makechtec.software.sql_support.SQLSupport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,18 @@ public class Config {
 
     @Bean
     public SQLSupport sqlSupport(){
-        return new SQLSupport("application.properties");
+
+        var allProperties = this.applicationPropertiesList();
+
+        ConnectionInformation connectionInformation = new ConnectionInformation(
+                allProperties.getDbUser(),
+                allProperties.getDbPassword(),
+                allProperties.getDbHost(),
+                allProperties.getDbPort(),
+                allProperties.getDbName()
+        );
+
+        return new SQLSupport(connectionInformation);
     }
 
     @Bean
@@ -57,20 +69,25 @@ public class Config {
     @Bean
     public WebMvcConfigurer corsConfigurer(){
 
-        var corsProperties = new PropertyLoader("application.properties");
+        var allProperties = this.applicationPropertiesList();
 
         var clientURL =
-                corsProperties.getProperty("cors_protocol").orElse("") + "://" + corsProperties.getProperty("cors_client_host").orElse("") + ":" + corsProperties.getProperty("cors_client_port").orElse("");
+                allProperties.getCorsProtocol() + "://" + allProperties.getCorsClientHost() + ":" + allProperties.getCorsClientPort();
 
         return new WebMvcConfigurer() {
 
             @Override
             public void addCorsMappings(CorsRegistry corsRegistry){
                 corsRegistry.addMapping("/**")
-                        .allowedMethods(corsProperties.getProperty("cors_methods").orElse(""))
+                        .allowedMethods(allProperties.getCorsMethods())
                         .allowedOrigins(clientURL);
             }
         };
+    }
+
+    @Bean
+    public ApplicationPropertiesList applicationPropertiesList(){
+        return new ApplicationPropertiesList();
     }
 
 }
