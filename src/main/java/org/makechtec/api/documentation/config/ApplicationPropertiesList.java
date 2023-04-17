@@ -8,9 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 @Setter
 public class ApplicationPropertiesList {
 
-    @Value("${server.servlet.context-path}")
-    private String contextPath;
-
     @Value("${db_user}")
     private String dbUser;
     @Value("${db_password}")
