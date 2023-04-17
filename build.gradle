@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'org.makechtec.api'
-version = '1.0.0'
+version = '1.0.1'
 sourceCompatibility = '17'
 
 configurations {
